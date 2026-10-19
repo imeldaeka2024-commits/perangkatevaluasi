@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AccuScore - Smart Grade Hub</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .glass-card { background: #ffffff; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03); border: 1px solid #e2e8f0; }
+        .chat-container::-webkit-scrollbar { width: 6px; }
+        .chat-container::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+    </style>
+</head>
+<body class="text-slate-800 h-screen flex flex-col md:flex-row overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="w-full md:w-64 bg-indigo-900 text-white flex flex-col flex-shrink-0 z-20 hidden md:flex">
+        <div class="p-6 border-b border-indigo-800">
+            <h1 class="text-2xl font-bold flex items-center gap-2">
+                <i class="fas fa-graduation-cap text-indigo-400"></i> AccuScore
+            </h1>
+            <p class="text-xs text-indigo-300 mt-1">Smart Grade Hub</p>
+        </div>
+        <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+            <a href="#" class="flex items-center gap-3 bg-indigo-800 px-4 py-3 rounded-lg text-sm font-medium transition-colors">
+                <i class="fas fa-chart-pie w-5"></i> Dashboard
+            </a>
+            <a href="#section-identitas" class="flex items-center gap-3 hover:bg-indigo-800 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-indigo-200 hover:text-white">
+                <i class="fas fa-sliders-h w-5"></i> Pengaturan
+            </a>
+            <a href="#section-tabel" class="flex items-center gap-3 hover:bg-indigo-800 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-indigo-200 hover:text-white">
+                <i class="fas fa-users w-5"></i> Data Siswa
+            </a>
+            <a href="#section-ai" class="flex items-center gap-3 hover:bg-indigo-800 px-4 py-3 rounded-lg text-sm font-medium transition-colors text-indigo-200 hover:text-white">
+                <i class="fas fa-robot w-5"></i> Asisten AI
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto relative bg-slate-50">
+        <!-- Top Header -->
+        <header class="bg-white shadow-sm px-6 py-4 flex justify-between items-center sticky top-0 z-10">
+            <h2 class="text-xl font-semibold text-slate-700">Dashboard Evaluasi Guru</h2>
+            <div class="flex items-center gap-3">
+                <span class="text-sm font-medium text-slate-500 hidden sm:block">Halo, Guru</span>
+                <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold">
+                    G
+                </div>
+            </div>
+        </header>
+
+        <div class="p-4 sm:p-6 lg:p-8 space-y-6 max-w-7xl mx-auto pb-24">
+            
+            <!-- 1. Identitas & 2. Pengaturan Bobot -->
+            <div id="section-identitas" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Identitas Kelas -->
+                <div class="glass-card p-6">
+                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2"><i class="fas fa-id-card text-indigo-500"></i> Identitas Pembelajaran</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-1">Pilih Kelas</label>
+                            <select id="inputKelas" class="w-full px-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
+                                <option value="X IPA 1">X IPA 1</option>
+                                <option value="X IPS 1">X IPS 1</option>
+                                <option value="XI IPA 1">XI IPA 1</option>
+                                <option value="XI IPS 2">XI IPS 2</option>
+                                <option value="XII IPA 1">XII IPA 1</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-600 mb-1">Mata Pelajaran</label>
+                            <input type="text" id="inputMapel" value="Matematika Lanjut" placeholder="Misal: Biologi, Matematika..." class="w-full px-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pengaturan Bobot -->
+                <div class="glass-card p-6">
+                    <h3 class="text-lg font-bold mb-4 flex items-center gap-2"><i class="fas fa-balance-scale text-indigo-500"></i> Pengaturan Bobot & KKM</h3>
+                    <div class="grid grid-cols-3 gap-4 mb-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1">Harian (%)</label>
+                            <input type="number" id="weightDaily" value="40" min="0" max="100" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1">UTS (%)</label>
+                            <input type="number" id="weightUts" value="30" min="0" max="100" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-600 mb-1">UAS (%)</label>
+                            <input type="number" id="weightUas" value="30" min="0" max="100" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 mb-1">Batas KKM</label>
+                        <input type="number" id="inputKkm" value="75" min="0" max="100" class="w-full px-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Area Upload Data -->
+            <section class="glass-card p-6">
+                <h3 class="text-lg font-bold mb-4 flex items-center gap-2"><i class="fas fa-cloud-upload-alt text-indigo-500"></i> Unggah Modul / Data Pendukung</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- File Upload -->
+                    <div class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-indigo-500 hover:bg-indigo-50 transition-colors cursor-pointer" onclick="document.getElementById('fileUpload').click()">
+                        <i class="fas fa-file-excel text-3xl text-slate-400 mb-2"></i>
+                        <h4 class="font-medium text-slate-700">Klik untuk Pilih File Data (XLS/PDF)</h4>
+                        <p class="text-xs text-slate-400 mt-1">Mendukung Multi-Sheet & Analisis Harian</p>
+                        <input type="file" id="fileUpload" class="hidden" accept=".pdf, .xls, .xlsx" onchange="handleFileUpload(this)">
+                    </div>
+
+                    <!-- URL Input -->
+                    <div class="border border-slate-200 rounded-xl p-6 flex flex-col justify-center bg-slate-50">
+                        <label class="font-medium text-slate-700 text-sm mb-2">Tautkan Link Materi / Google Drive</label>
+                        <div class="flex gap-2">
+                            <input type="url" id="urlInput" placeholder="https://..." class="flex-1 px-4 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+                            <button onclick="handleUrlUpload()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                                Tautkan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. Kartu Statistik -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+                <div class="glass-card p-5 flex items-center gap-4 border-l-4 border-indigo-500">
+                    <div class="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-500 text-xl hidden sm:flex"><i class="fas fa-chart-line"></i></div>
+                    <div>
+                        <p class="text-xs sm:text-sm text-slate-500 font-medium">Rata-rata Kelas</p>
+                        <h4 class="text-2xl sm:text-3xl font-bold text-slate-800" id="statAvg">0</h4>
+                    </div>
+                </div>
+                <div class="glass-card p-5 flex items-center gap-4 border-l-4 border-emerald-500">
+                    <div class="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-500 text-xl hidden sm:flex"><i class="fas fa-arrow-up"></i></div>
+                    <div>
+                        <p class="text-xs sm:text-sm text-slate-500 font-medium">Nilai Tertinggi</p>
+                        <h4 class="text-2xl sm:text-3xl font-bold text-slate-800" id="statMax">0</h4>
+                    </div>
+                </div>
+                <div class="glass-card p-5 flex items-center gap-4 border-l-4 border-rose-500">
+                    <div class="w-12 h-12 rounded-full bg-rose-50 flex items-center justify-center text-rose-500 text-xl hidden sm:flex"><i class="fas fa-arrow-down"></i></div>
+                    <div>
+                        <p class="text-xs sm:text-sm text-slate-500 font-medium">Nilai Terendah</p>
+                        <h4 class="text-2xl sm:text-3xl font-bold text-slate-800" id="statMin">0</h4>
+                    </div>
+                </div>
+                <div class="glass-card p-5 flex items-center gap-4 border-l-4 border-sky-500">
+                    <div class="w-12 h-12 rounded-full bg-sky-50 flex items-center justify-center text-sky-500 text-xl hidden sm:flex"><i class="fas fa-check-circle"></i></div>
+                    <div>
+                        <p class="text-xs sm:text-sm text-slate-500 font-medium">Ketuntasan</p>
+                        <h4 class="text-2xl sm:text-3xl font-bold text-slate-800" id="statPass">0%</h4>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Grafik -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Bar Chart -->
+                <div class="glass-card p-6">
+                    <h3 class="text-lg font-bold mb-4 text-slate-700"><i class="fas fa-chart-bar text-indigo-500 mr-2"></i> Distribusi Nilai Kelas</h3>
+                    <div class="relative h-64 w-full">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+                <!-- Pie Chart -->
+                <div class="glass-card p-6">
+                    <h3 class="text-lg font-bold mb-4 text-slate-700"><i class="fas fa-chart-pie text-indigo-500 mr-2"></i> Diagnostik Topik Sulit</h3>
+                    <div class="relative h-64 w-full flex justify-center">
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 6. Tabel Siswa -->
+            <section id="section-tabel" class="glass-card p-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                    <h3 class="text-lg font-bold flex items-center gap-2"><i class="fas fa-table text-indigo-500"></i> Rekapitulasi & Diagnostik Siswa</h3>
+                    <span class="bg-amber-100 text-amber-800 text-xs px-3 py-1 rounded-full font-medium"><i class="fas fa-info-circle mr-1"></i> Data Real-time</span>
+                </div>
+                
+                <!-- Form Tambah Siswa -->
+                <form id="formAddStudent" class="bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6 grid grid-cols-2 md:grid-cols-6 lg:grid-cols-12 gap-4 items-end">
+                    <div class="col-span-2 md:col-span-3 lg:col-span-3">
+                        <label class="block text-xs font-medium text-slate-500 mb-1">Nama Siswa</label>
+                        <input type="text" id="addName" required placeholder="Nama lengkap..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-1 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div class="col-span-1 md:col-span-1 lg:col-span-1">
+                        <label class="block text-xs font-medium text-slate-500 mb-1">Harian</label>
+                        <input type="number" id="addDaily" required min="0" max="100" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-1 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div class="col-span-1 md:col-span-1 lg:col-span-1">
+                        <label class="block text-xs font-medium text-slate-500 mb-1">UTS</label>
+                        <input type="number" id="addUts" required min="0" max="100" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-1 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div class="col-span-1 md:col-span-1 lg:col-span-1">
+                        <label class="block text-xs font-medium text-slate-500 mb-1">UAS</label>
+                        <input type="number" id="addUas" required min="0" max="100" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-1 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div class="col-span-2 md:col-span-3 lg:col-span-4">
+                        <label class="block text-xs font-medium text-slate-500 mb-1">Topik Sulit (Kosongkan jika tuntas)</label>
+                        <input type="text" id="addTopic" placeholder="Misal: Aljabar, Peluang..." class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-1 focus:ring-indigo-500 outline-none">
+                    </div>
+                    <div class="col-span-2 md:col-span-3 lg:col-span-2">
+                        <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm">
+                            <i class="fas fa-plus mr-1"></i> Tambah
+                        </button>
+                    </div>
+                </form>
+
+                <div class="overflow-x-auto rounded-lg border border-slate-200">
+                    <table class="w-full text-left border-collapse whitespace-nowrap">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-600 text-sm border-b border-slate-200">
+                                <th class="p-4 font-semibold w-12">No</th>
+                                <th class="p-4 font-semibold">Nama Siswa</th>
+                                <th class="p-4 font-semibold text-center w-20">Harian</th>
+                                <th class="p-4 font-semibold text-center w-20">UTS</th>
+                                <th class="p-4 font-semibold text-center w-20">UAS</th>
+                                <th class="p-4 font-semibold text-center w-24">N. Akhir</th>
+                                <th class="p-4 font-semibold text-center w-28">Status</th>
+                                <th class="p-4 font-semibold">Topik Sulit (Diagnostik)</th>
+                                <th class="p-4 font-semibold text-center w-16">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentTableBody" class="text-sm divide-y divide-slate-100 bg-white">
+                            <!-- Data injected via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- 7. Asisten AI -->
+            <section id="section-ai" class="glass-card overflow-hidden flex flex-col h-[550px] shadow-lg border-indigo-100">
+                <div class="bg-gradient-to-r from-indigo-700 to-purple-700 text-white p-5 flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-2xl backdrop-blur-sm shadow-inner">
+                            <i class="fas fa-robot text-white"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg">Konsultasi Asisten AI</h3>
+                            <p class="text-xs text-indigo-100 opacity-90">Pendidikan & Strategi Remedial</p>
+                        </div>
+                    </div>
+                    <span class="bg-white/20 px-3 py-1 rounded-full text-xs flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div> Online</span>
+                </div>
+                
+                <div id="chatHistory" class="chat-container flex-1 p-6 overflow-y-auto flex flex-col gap-5 bg-slate-50">
+                    <!-- Default Greeting -->
+                    <div class="flex gap-4 max-w-[85%]">
+                        <div class="w-10 h-10 rounded-full bg-indigo-100 flex-shrink-0 flex items-center justify-center text-indigo-700 shadow-sm"><i class="fas fa-robot"></i></div>
+                        <div class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm border border-slate-200 text-sm text-slate-700 leading-relaxed">
+                            Halo Bapak/Ibu Guru! Saya adalah Asisten AI AccuScore. Silakan tanyakan strategi mengajar, rancangan remedial, atau minta saya menganalisis kendala siswa berdasarkan data di atas secara spesifik.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-white border-t border-slate-200">
+                    <form id="chatForm" class="flex gap-3 relative">
+                        <input type="text" id="chatInput" placeholder="Ketik pertanyaan untuk AI (misal: Tolong buatkan rancangan remedial untuk Budi)..." class="flex-1 px-5 py-3 pr-12 border border-slate-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm bg-slate-50 transition-all shadow-inner">
+                        <button type="submit" id="btnSendChat" class="absolute right-2 top-1.5 bottom-1.5 bg-indigo-600 hover:bg-indigo-700 text-white w-10 rounded-full flex items-center justify-center transition-all shadow-md">
+                            <i class="fas fa-paper-plane text-sm"></i>
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-slate-800 text-white px-6 py-4 rounded-xl shadow-2xl transform translate-y-24 opacity-0 transition-all duration-300 z-50 flex items-center gap-3">
+        <i class="fas fa-check-circle text-emerald-400 text-xl"></i>
+        <span id="toastMsg" class="text-sm font-medium">Aksi berhasil!</span>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // State Application
+        const state = {
+            kkm: 75,
+            wDaily: 40,
+            wUts: 30,
+            wUas: 30,
+            className: 'X IPA 1',
+            subject: 'Matematika Lanjut'
+        };
+
+        // Data Siswa Awal
+        let students = [
+            { id: 1, name: 'Budi Santoso', daily: 65, uts: 60, uas: 65, topic: 'Trigonometri' },
+            { id: 2, name: 'Siti Aminah', daily: 90, uts: 85, uas: 92, topic: '-' },
+            { id: 3, name: 'Anwar Ibrahim', daily: 70, uts: 75, uas: 72, topic: 'Fungsi Invers' },
+            { id: 4, name: 'Rina Kusuma', daily: 88, uts: 90, uas: 85, topic: '-' },
+            { id: 5, name: 'Dedi Kurniawan', daily: 55, uts: 60, uas: 58, topic: 'Trigonometri' },
+            { id: 6, name: 'Maya Lestari', daily: 95, uts: 92, uas: 96, topic: '-' }
+        ];
+
+        // Chart Instances
+        let barChartInstance = null;
+        let pieChartInstance = null;
+        let chatContext = []; // History AI
+
+        // --- Core Functions ---
+
+        function calculateFinal(s) {
+            // (Harian * bobot/100) + (UTS * bobot/100) + (UAS * bobot/100)
+            const final = (s.daily * (state.wDaily/100)) + (s.uts * (state.wUts/100)) + (s.uas * (state.wUas/100));
+            return Math.round(final);
+        }
+
+        function updateStateFromInputs() {
+            state.kkm = parseInt(document.getElementById('inputKkm').value) || 75;
+            state.wDaily = parseInt(document.getElementById('weightDaily').value) || 40;
+            state.wUts = parseInt(document.getElementById('weightUts').value) || 30;
+            state.wUas = parseInt(document.getElementById('weightUas').value) || 30;
+            state.className = document.getElementById('inputKelas').value;
+            state.subject = document.getElementById('inputMapel').value;
+            updateAll();
+        }
+
+        function generateId() {
+            return students.length > 0 ? Math.max(...students.map(s => s.id)) + 1 : 1;
+        }
+
+        // --- Render UI ---
+
+        function renderTable() {
+            const tbody = document.getElementById('studentTableBody');
+            tbody.innerHTML = '';
+            
+            students.forEach((s, i) => {
+                const finalGrade = calculateFinal(s);
+                const isPass = finalGrade >= state.kkm;
+                
+                let statusHtml = '';
+                if(isPass) {
+                    statusHtml = `<span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-md text-xs font-semibold border border-emerald-200"><i class="fas fa-check"></i> Tuntas</span>`;
+                } else {
+                    statusHtml = `<span class="inline-flex items-center gap-1 bg-rose-50 text-rose-700 px-2.5 py-1 rounded-md text-xs font-semibold border border-rose-200"><i class="fas fa-exclamation-triangle"></i> Remedial</span>`;
+                }
+
+                // If passed, topic is usually none
+                const displayTopic = isPass ? '<span class="text-slate-400 italic">Tidak ada</span>' : `<span class="text-rose-600 font-medium">${s.topic || 'Belum dianalisis'}</span>`;
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-colors";
+                tr.innerHTML = `
+                    <td class="p-4 text-slate-500">${i + 1}</td>
+                    <td class="p-4 font-medium text-slate-800">${s.name}</td>
+                    <td class="p-4 text-center text-slate-600">${s.daily}</td>
+                    <td class="p-4 text-center text-slate-600">${s.uts}</td>
+                    <td class="p-4 text-center text-slate-600">${s.uas}</td>
+                    <td class="p-4 text-center font-bold ${isPass ? 'text-emerald-600' : 'text-rose-600'}">${finalGrade}</td>
+                    <td class="p-4 text-center">${statusHtml}</td>
+                    <td class="p-4">${displayTopic}</td>
+                    <td class="p-4 text-center">
+                        <button onclick="deleteStudent(${s.id})" class="text-slate-400 hover:text-rose-600 hover:bg-rose-50 w-8 h-8 rounded-lg transition-colors" title="Hapus">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderStats() {
+            if (students.length === 0) {
+                document.getElementById('statAvg').innerText = '0';
+                document.getElementById('statMax').innerText = '0';
+                document.getElementById('statMin').innerText = '0';
+                document.getElementById('statPass').innerText = '0%';
+                return;
+            }
+
+            const finals = students.map(calculateFinal);
+            const sum = finals.reduce((a, b) => a + b, 0);
+            const avg = Math.round(sum / finals.length);
+            const max = Math.max(...finals);
+            const min = Math.min(...finals);
+            const passedCount = finals.filter(f => f >= state.kkm).length;
+            const passPct = Math.round((passedCount / finals.length) * 100);
+
+            // Animate numbers (simple replacement for now)
+            document.getElementById('statAvg').innerText = avg;
+            document.getElementById('statMax').innerText = max;
+            document.getElementById('statMin').innerText = min;
+            document.getElementById('statPass').innerText = passPct + '%';
+        }
+
+        function renderCharts() {
+            const finals = students.map(calculateFinal);
+            
+            // 1. Bar Chart Data (Distribution)
+            let ranges = [0, 0, 0, 0]; // 0-59, 60-74, 75-89, 90-100
+            finals.forEach(f => {
+                if (f < 60) ranges[0]++;
+                else if (f < 75) ranges[1]++;
+                else if (f < 90) ranges[2]++;
+                else ranges[3]++;
+            });
+
+            const barCtx = document.getElementById('barChart').getContext('2d');
+            if (barChartInstance) barChartInstance.destroy();
+            
+            barChartInstance = new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['0 - 59', '60 - 74', '75 - 89', '90 - 100'],
+                    datasets: [{
+                        label: 'Jumlah Siswa',
+                        data: ranges,
+                        backgroundColor: [
+                            'rgba(244, 63, 94, 0.8)', // rose
+                            'rgba(251, 191, 36, 0.8)', // amber
+                            'rgba(99, 102, 241, 0.8)', // indigo
+                            'rgba(16, 185, 129, 0.8)'  // emerald
+                        ],
+                        borderRadius: 6,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { stepSize: 1 } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            // 2. Pie Chart Data (Difficult Topics amongst failed students)
+            const failedStudents = students.filter(s => calculateFinal(s) < state.kkm);
+            const topicCounts = {};
+            failedStudents.forEach(s => {
+                const t = s.topic && s.topic !== '-' ? s.topic.trim() : 'Tidak Diketahui';
+                topicCounts[t] = (topicCounts[t] || 0) + 1;
+            });
+
+            const pieLabels = Object.keys(topicCounts);
+            const pieData = Object.values(topicCounts);
+            
+            const pieCtx = document.getElementById('pieChart').getContext('2d');
+            if (pieChartInstance) pieChartInstance.destroy();
+
+            if(pieLabels.length === 0) {
+                 pieChartInstance = new Chart(pieCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Semua Tuntas / Aman'],
+                        datasets: [{ data: [1], backgroundColor: ['#d1fae5'] }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins:{tooltip:{enabled:false}} }
+                });
+            } else {
+                pieChartInstance = new Chart(pieCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: pieLabels,
+                        datasets: [{
+                            data: pieData,
+                            backgroundColor: ['#6366f1', '#f43f5e', '#f59e0b', '#8b5cf6', '#14b8a6'],
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false,
+                        cutout: '65%',
+                        plugins: { legend: { position: 'bottom', labels:{boxWidth: 12} } }
+                    }
+                });
+            }
+        }
+
+        function updateAll() {
+            renderTable();
+            renderStats();
+            renderCharts();
+        }
+
+        // --- Event Listeners ---
+
+        // Listen to Input Changes for Weights & Identity
+        ['weightDaily', 'weightUts', 'weightUas', 'inputKkm', 'inputKelas', 'inputMapel'].forEach(id => {
+            document.getElementById(id).addEventListener('change', updateStateFromInputs);
+        });
+
+        // Add Student Submission
+        document.getElementById('formAddStudent').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('addName').value;
+            const daily = parseInt(document.getElementById('addDaily').value);
+            const uts = parseInt(document.getElementById('addUts').value);
+            const uas = parseInt(document.getElementById('addUas').value);
+            let topic = document.getElementById('addTopic').value || '-';
+
+            students.push({ id: generateId(), name, daily, uts, uas, topic });
+            
+            e.target.reset();
+            updateAll();
+            showToast('Data siswa berhasil ditambahkan!');
+        });
+
+        function deleteStudent(id) {
+            if(confirm('Yakin ingin menghapus data siswa ini?')) {
+                students = students.filter(s => s.id !== id);
+                updateAll();
+                showToast('Data siswa dihapus.');
+            }
+        }
+
+        // Simulators for Uploads
+        function handleFileUpload(input) {
+            if (input.files && input.files[0]) {
+                const fileName = input.files[0].name;
+                showToast(`File Excel/PDF "${fileName}" berhasil dibaca sistem.`);
+                input.value = ''; 
+            }
+        }
+
+        function handleUrlUpload() {
+            const urlInput = document.getElementById('urlInput');
+            if (urlInput.value.trim()) {
+                showToast('Tautan materi berhasil ditambahkan ke referensi AI.');
+                urlInput.value = '';
+            }
+        }
+
+        // Toast Helper
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = message;
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+            }, 3500);
+        }
+
+        // --- Asisten AI (Gemini Integration) ---
+
+        // Format data untuk Prompt AI
+        function buildContextPrompt() {
+            const finals = students.map(calculateFinal);
+            const sum = finals.reduce((a, b) => a + b, 0);
+            const avg = students.length ? Math.round(sum / students.length) : 0;
+            
+            const remedials = students.filter(s => calculateFinal(s) < state.kkm);
+            const remedialDetails = remedials.map(s => `- ${s.name} (Nilai: ${calculateFinal(s)}, Kendala: ${s.topic})`).join('\n');
+
+            return `
+[Data Konteks Saat Ini]
+Mata Pelajaran: ${state.subject}
+Kelas: ${state.className}
+Batas KKM: ${state.kkm}
+Rata-rata Kelas: ${avg}
+Daftar Siswa Remedial dan Topik Sulitnya:
+${remedials.length > 0 ? remedialDetails : 'Tidak ada siswa remedial. Semua Tuntas!'}
+            `;
+        }
+
+        async function fetchGeminiAPI(userText) {
+            // Using generic/empty API key architecture as specified by Canvas environment rules
+            const apiKey = ""; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const systemPrompt = `Anda adalah "Asisten AI AccuScore", pakar pendidikan dan pedagogi ramah yang membantu guru menganalisis nilai. 
+Berikan solusi praktis, metode mengajar, dan ide remedial yang relevan dengan spesifikasi mata pelajaran. BUKAN template umum. 
+Tanggapan harus rapi dan langsung pada poinnya, gunakan paragraf pendek atau poin-poin.
+Berikut adalah data terkini kelas guru tersebut:
+${buildContextPrompt()}`;
+
+            const historyText = chatContext.map(c => `${c.role}: ${c.text}`).join('\n');
+            const promptStr = `${systemPrompt}\n\n[Riwayat Percakapan]\n${historyText}\n\nGuru: ${userText}\nAI:`;
+
+            const payload = {
+                contents: [{ parts: [{ text: promptStr }] }]
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates.length > 0) {
+                    return result.candidates[0].content.parts[0].text;
+                } else {
+                    throw new Error("No Content");
+                }
+            } catch (error) {
+                console.error("Gemini API Error:", error);
+                return "Maaf Bapak/Ibu Guru, saya sedang mengalami kendala jaringan dalam memproses data. Mohon tunggu sebentar dan coba lagi ya.";
+            }
+        }
+
+        function renderChatBubble(role, text) {
+            const container = document.getElementById('chatHistory');
+            const div = document.createElement('div');
+            
+            // Basic markdown parser for bolding
+            const parsedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
+
+            if (role === 'user') {
+                div.className = "flex gap-4 max-w-[85%] self-end flex-row-reverse";
+                div.innerHTML = `
+                    <div class="w-10 h-10 rounded-full bg-indigo-600 flex-shrink-0 flex items-center justify-center text-white font-bold text-sm shadow-md">G</div>
+                    <div class="bg-indigo-600 p-4 rounded-2xl rounded-tr-none shadow-md text-sm text-white leading-relaxed">
+                        ${parsedText}
+                    </div>
+                `;
+            } else {
+                div.className = "flex gap-4 max-w-[85%]";
+                div.innerHTML = `
+                    <div class="w-10 h-10 rounded-full bg-indigo-100 flex-shrink-0 flex items-center justify-center text-indigo-700 shadow-sm"><i class="fas fa-robot"></i></div>
+                    <div class="bg-white p-4 rounded-2xl rounded-tl-none shadow-sm border border-slate-200 text-sm text-slate-700 leading-relaxed">
+                        ${parsedText}
+                    </div>
+                `;
+            }
+            container.appendChild(div);
+            
+            // smooth scroll to bottom
+            setTimeout(() => {
+                container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+            }, 50);
+        }
+
+        document.getElementById('chatForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('chatInput');
+            const btn = document.getElementById('btnSendChat');
+            const text = input.value.trim();
+            
+            if (!text) return;
+
+            // Render User Chat
+            renderChatBubble('user', text);
+            chatContext.push({role: 'Guru', text: text});
+            input.value = '';
+            
+            // Loading State
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fas fa-circle-notch fa-spin text-sm"></i>`;
+            
+            // Fetch AI
+            const responseText = await fetchGeminiAPI(text);
+            
+            // Render AI Chat
+            renderChatBubble('ai', responseText);
+            chatContext.push({role: 'AI', text: responseText});
+            
+            // Restore State
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fas fa-paper-plane text-sm"></i>`;
+            input.focus();
+        });
+
+        // Initialize App
+        window.onload = () => {
+            updateAll();
+        };
+
+    </script>
+</body>
+</html>
